@@ -50,9 +50,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const response = await apiLogin(email, password);
+    // Fusionner user + sous_sections + admin_rights
+    const userData: User = {
+      ...response.user,
+      sous_sections: response.sous_sections || [],
+      is_admin: !!response.admin_rights,
+      admin_rights: response.admin_rights
+        ? Object.keys(response.admin_rights).filter((k) => response.admin_rights[k])
+        : [],
+    };
     localStorage.setItem('pdc_report_token', response.token);
-    localStorage.setItem('pdc_report_user', JSON.stringify(response.user));
-    setUser(response.user);
+    localStorage.setItem('pdc_report_user', JSON.stringify(userData));
+    setUser(userData);
   }, []);
 
   const logout = useCallback(() => {

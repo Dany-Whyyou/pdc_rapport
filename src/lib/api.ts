@@ -34,20 +34,9 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
 }
 
 // Auth
-export async function login(email: string, password: string) {
-  return request<{
-    token: string;
-    user: {
-      id: number;
-      name: string;
-      surname: string;
-      email: string;
-      photo: string;
-      sous_sections: Array<{ id: number; nom: string }>;
-      is_admin: boolean;
-      admin_rights: string[];
-    };
-  }>('/api/report/login', {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function login(email: string, password: string): Promise<any> {
+  return request<Record<string, unknown>>('/api/report/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
