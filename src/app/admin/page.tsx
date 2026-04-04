@@ -22,6 +22,7 @@ interface SousSection {
 
 interface Membre {
   id: number;
+  user_id?: number;
   name: string;
   surname: string;
   email: string;
@@ -311,7 +312,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleRemoveAdmin(m.id)}
+                    onClick={() => handleRemoveAdmin(m.user_id || m.id)}
                     className="text-red-500 hover:text-red-700 p-1"
                     title="Retirer les droits admin"
                   >
