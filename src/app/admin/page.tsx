@@ -16,8 +16,8 @@ import {
 interface SousSection {
   id: number;
   nom: string;
-  section_id: number;
-  section_nom: string;
+  slug: string;
+  couleur: string;
 }
 
 interface Membre {
@@ -71,7 +71,7 @@ export default function AdminPage() {
     if (selectedSS) {
       setLoadingMembers(true);
       getSousSectionMembers(selectedSS)
-        .then(setSSMembers)
+        .then((data) => setSSMembers(data.membres || []))
         .catch((err) => console.error('Erreur chargement membres:', err))
         .finally(() => setLoadingMembers(false));
     }
@@ -81,7 +81,7 @@ export default function AdminPage() {
     if (activeTab === 'admins' && isAuthenticated) {
       setLoadingAdmins(true);
       getReportAdmins()
-        .then(setAdmins)
+        .then((data) => setAdmins(data.admins || []))
         .catch((err) => console.error('Erreur chargement admins:', err))
         .finally(() => setLoadingAdmins(false));
     }
@@ -92,8 +92,8 @@ export default function AdminPage() {
     setSearchQuery('');
     setShowAddModal(true);
     try {
-      const members = await getMembresActifs();
-      setAllMembers(members);
+      const data = await getMembresActifs();
+      setAllMembers(data.membres || []);
     } catch (err) {
       console.error('Erreur chargement membres actifs:', err);
     }
@@ -102,17 +102,17 @@ export default function AdminPage() {
   const handleAddMember = async (membreId: number) => {
     if (addTarget === 'member' && selectedSS) {
       try {
-        await addSousSectionMember({ sous_section_id: selectedSS, membre_id: membreId });
-        const updated = await getSousSectionMembers(selectedSS);
-        setSSMembers(updated);
+        await addSousSectionMember({ sous_section_id: selectedSS, user_id: membreId });
+        const data = await getSousSectionMembers(selectedSS);
+        setSSMembers(data.membres || []);
       } catch (err) {
         alert(err instanceof Error ? err.message : 'Erreur');
       }
     } else if (addTarget === 'admin') {
       try {
-        await setReportAdmin({ membre_id: membreId, is_admin: true });
-        const updated = await getReportAdmins();
-        setAdmins(updated);
+        await setReportAdmin({ user_id: membreId, can_edit_all: true, can_validate: true, can_export: true });
+        const data = await getReportAdmins();
+        setAdmins(data.admins || []);
       } catch (err) {
         alert(err instanceof Error ? err.message : 'Erreur');
       }
@@ -124,9 +124,9 @@ export default function AdminPage() {
     if (!selectedSS) return;
     if (!confirm('Retirer ce membre de la sous-section ?')) return;
     try {
-      await removeSousSectionMember({ sous_section_id: selectedSS, membre_id: membreId });
-      const updated = await getSousSectionMembers(selectedSS);
-      setSSMembers(updated);
+      await removeSousSectionMember({ sous_section_id: selectedSS, user_id: membreId });
+      const data = await getSousSectionMembers(selectedSS);
+      setSSMembers(data.membres || []);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erreur');
     }
@@ -135,9 +135,9 @@ export default function AdminPage() {
   const handleRemoveAdmin = async (membreId: number) => {
     if (!confirm('Retirer les droits administrateur a cet utilisateur ?')) return;
     try {
-      await setReportAdmin({ membre_id: membreId, is_admin: false });
-      const updated = await getReportAdmins();
-      setAdmins(updated);
+      await setReportAdmin({ user_id: membreId, can_edit_all: false, can_validate: false, can_export: false });
+      const data = await getReportAdmins();
+      setAdmins(data.admins || []);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erreur');
     }
@@ -199,7 +199,7 @@ export default function AdminPage() {
                   }`}
                 >
                   <p className="font-medium">{ss.nom}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{ss.section_nom}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{ss.slug}</p>
                 </button>
               ))}
               {sousSections.length === 0 && (

@@ -5,9 +5,11 @@ import { useState } from 'react';
 export interface BilanEntry {
   id?: number;
   theme: string;
+  sous_theme?: string;
   points_positifs: string;
   points_negatifs: string;
   propositions: string;
+  ordre?: number;
 }
 
 interface BilanTableProps {

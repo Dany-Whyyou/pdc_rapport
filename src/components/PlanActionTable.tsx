@@ -4,11 +4,13 @@ import { useState } from 'react';
 
 export interface PlanEntry {
   id?: number;
+  numero_defi?: number;
   defi: string;
   action_a: string;
   action_b: string;
   action_c: string;
   action_d: string;
+  ordre?: number;
 }
 
 interface PlanActionTableProps {

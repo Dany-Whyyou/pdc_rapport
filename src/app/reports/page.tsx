@@ -13,7 +13,7 @@ interface Report {
   trimestre: number;
   statut: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export default function ReportsPage() {
@@ -38,7 +38,7 @@ export default function ReportsPage() {
 
       setLoadingReports(true);
       getReports(params)
-        .then((data) => setReports(data))
+        .then((data) => setReports(data.reports || []))
         .catch((err) => console.error('Erreur chargement rapports:', err))
         .finally(() => setLoadingReports(false));
     }

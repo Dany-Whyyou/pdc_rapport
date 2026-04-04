@@ -44,59 +44,67 @@ export async function login(email: string, password: string): Promise<any> {
 
 // Sous-sections
 export async function getSousSections() {
-  return request<Array<{ id: number; nom: string; section_id: number; section_nom: string }>>(
+  return request<Array<{ id: number; nom: string; slug: string; couleur: string }>>(
     '/api/report/sous-sections'
   );
 }
 
 // Reports
 export async function getReports(params?: { year?: number; status?: string }) {
-  return request<
-    Array<{
+  const query = new URLSearchParams();
+  if (params?.year) query.set('annee', String(params.year));
+  if (params?.status) query.set('statut', params.status);
+  const qs = query.toString();
+  return request<{
+    success: boolean;
+    reports: Array<{
       id: number;
       titre: string;
       annee: number;
       trimestre: number;
       statut: string;
       created_at: string;
-      updated_at: string;
-    }>
-  >('/api/report/list', {
-    method: 'POST',
-    body: JSON.stringify(params || {}),
-  });
+    }>;
+  }>(`/api/report/reports${qs ? '?' + qs : ''}`);
 }
 
 export async function getReport(id: number) {
   return request<{
-    id: number;
-    titre: string;
-    annee: number;
-    trimestre: number;
-    statut: string;
-    sous_sections: Array<{
+    success: boolean;
+    report: {
       id: number;
-      nom: string;
-      bilan: Array<{
+      titre: string;
+      annee: number;
+      trimestre: number;
+      statut: string;
+      sections: Array<{
         id: number;
-        theme: string;
-        points_positifs: string;
-        points_negatifs: string;
-        propositions: string;
+        sous_section_id: number;
+        sous_section_nom: string;
+        statut: string;
+        can_edit: boolean;
+        bilan_entries: Array<{
+          id: number;
+          theme: string;
+          sous_theme: string;
+          points_positifs: string;
+          points_negatifs: string;
+          propositions: string;
+          ordre: number;
+        }>;
+        plan_entries: Array<{
+          id: number;
+          numero_defi: number;
+          defi: string;
+          action_a: string;
+          action_b: string;
+          action_c: string;
+          action_d: string;
+          ordre: number;
+        }>;
       }>;
-      plan_action: Array<{
-        id: number;
-        defi: string;
-        action_a: string;
-        action_b: string;
-        action_c: string;
-        action_d: string;
-      }>;
-    }>;
-  }>('/api/report/get', {
-    method: 'POST',
-    body: JSON.stringify({ id }),
-  });
+    };
+  }>(`/api/report/reports/${id}`);
 }
 
 export async function createReport(data: {
@@ -105,7 +113,7 @@ export async function createReport(data: {
   trimestre: number;
   type?: string;
 }) {
-  return request<{ id: number; message: string }>('/api/report/create', {
+  return request<{ success: boolean; id: number; message: string }>('/api/report/reports/create', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -114,21 +122,24 @@ export async function createReport(data: {
 // Bilan entries
 export async function saveBilanEntry(data: {
   id?: number;
-  report_id: number;
-  sous_section_id: number;
+  report_section_id?: number;
+  report_id?: number;
+  sous_section_id?: number;
   theme: string;
+  sous_theme?: string;
   points_positifs: string;
   points_negatifs: string;
   propositions: string;
+  ordre?: number;
 }) {
-  return request<{ id: number; message: string }>('/api/report/bilan/save', {
+  return request<{ success: boolean; id: number; message: string }>('/api/report/bilan/save', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteBilanEntry(id: number) {
-  return request<{ message: string }>('/api/report/bilan/delete', {
+  return request<{ success: boolean; message: string }>('/api/report/bilan/delete', {
     method: 'POST',
     body: JSON.stringify({ id }),
   });
@@ -137,22 +148,25 @@ export async function deleteBilanEntry(id: number) {
 // Plan d'action entries
 export async function savePlanEntry(data: {
   id?: number;
-  report_id: number;
-  sous_section_id: number;
+  report_section_id?: number;
+  report_id?: number;
+  sous_section_id?: number;
+  numero_defi?: number;
   defi: string;
   action_a: string;
   action_b: string;
   action_c: string;
   action_d: string;
+  ordre?: number;
 }) {
-  return request<{ id: number; message: string }>('/api/report/plan/save', {
+  return request<{ success: boolean; id: number; message: string }>('/api/report/plan/save', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 }
 
 export async function deletePlanEntry(id: number) {
-  return request<{ message: string }>('/api/report/plan/delete', {
+  return request<{ success: boolean; message: string }>('/api/report/plan/delete', {
     method: 'POST',
     body: JSON.stringify({ id }),
   });
@@ -160,7 +174,7 @@ export async function deletePlanEntry(id: number) {
 
 // Validation
 export async function validateReport(id: number) {
-  return request<{ message: string }>('/api/report/validate', {
+  return request<{ success: boolean; message: string }>('/api/report/validate', {
     method: 'POST',
     body: JSON.stringify({ id }),
   });
@@ -168,29 +182,28 @@ export async function validateReport(id: number) {
 
 // Sous-section members
 export async function getSousSectionMembers(id: number) {
-  return request<
-    Array<{ id: number; name: string; surname: string; email: string; photo: string }>
-  >('/api/report/sous-section/members', {
-    method: 'POST',
-    body: JSON.stringify({ id }),
-  });
+  return request<{
+    success: boolean;
+    membres: Array<{ id: number; name: string; surname: string; email: string; photo: string; role: string }>;
+  }>(`/api/report/sous-sections/${id}/members`);
 }
 
 export async function addSousSectionMember(data: {
   sous_section_id: number;
-  membre_id: number;
+  user_id: number;
+  role?: string;
 }) {
-  return request<{ message: string }>('/api/report/sous-section/add-member', {
+  return request<{ success: boolean; message: string }>('/api/report/sous-sections/add-member', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({ ...data, role: data.role || 'editeur' }),
   });
 }
 
 export async function removeSousSectionMember(data: {
   sous_section_id: number;
-  membre_id: number;
+  user_id: number;
 }) {
-  return request<{ message: string }>('/api/report/sous-section/remove-member', {
+  return request<{ success: boolean; message: string }>('/api/report/sous-sections/remove-member', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -198,20 +211,22 @@ export async function removeSousSectionMember(data: {
 
 // Membres actifs
 export async function getMembresActifs() {
-  return request<
-    Array<{ id: number; name: string; surname: string; email: string; photo: string }>
-  >('/api/report/membres-actifs');
+  return request<{
+    success: boolean;
+    membres: Array<{ id: number; name: string; surname: string; email: string; photo: string }>;
+  }>('/api/report/membres-actifs');
 }
 
 // Admin management
 export async function getReportAdmins() {
-  return request<
-    Array<{ id: number; name: string; surname: string; email: string; photo: string }>
-  >('/api/report/admins');
+  return request<{
+    success: boolean;
+    admins: Array<{ id: number; user_id: number; name: string; surname: string; email: string; photo: string; can_edit_all: boolean; can_validate: boolean; can_export: boolean }>;
+  }>('/api/report/admins');
 }
 
-export async function setReportAdmin(data: { membre_id: number; is_admin: boolean }) {
-  return request<{ message: string }>('/api/report/admins/set', {
+export async function setReportAdmin(data: { user_id: number; can_edit_all?: boolean; can_validate?: boolean; can_export?: boolean }) {
+  return request<{ success: boolean; message: string }>('/api/report/admins/set', {
     method: 'POST',
     body: JSON.stringify(data),
   });

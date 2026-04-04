@@ -17,21 +17,27 @@ import ExportButtons from '@/components/ExportButtons';
 
 interface SousSection {
   id: number;
+  sous_section_id: number;
   nom: string;
+  can_edit: boolean;
   bilan: Array<{
     id: number;
     theme: string;
+    sous_theme: string;
     points_positifs: string;
     points_negatifs: string;
     propositions: string;
+    ordre: number;
   }>;
   plan_action: Array<{
     id: number;
+    numero_defi: number;
     defi: string;
     action_a: string;
     action_b: string;
     action_c: string;
     action_d: string;
+    ordre: number;
   }>;
 }
 
@@ -69,11 +75,29 @@ function ReportDetailContent() {
     if (!reportId) return;
     setLoadingReport(true);
     try {
-      const data = await getReport(reportId);
-      setReport(data);
+      const response = await getReport(reportId);
+      const r = response.report;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mappedSections: SousSection[] = (r.sections || []).map((s: any) => ({
+        id: s.id as number,
+        sous_section_id: s.sous_section_id as number,
+        nom: (s.sous_section_nom || '') as string,
+        can_edit: !!s.can_edit,
+        bilan: s.bilan_entries || [],
+        plan_action: s.plan_entries || [],
+      }));
+      const reportData: ReportData = {
+        id: r.id as number,
+        titre: r.titre as string,
+        annee: r.annee as number,
+        trimestre: r.trimestre as number,
+        statut: r.statut as string,
+        sous_sections: mappedSections,
+      };
+      setReport(reportData);
       const bEdits: Record<number, BilanEntry[]> = {};
       const pEdits: Record<number, PlanEntry[]> = {};
-      data.sous_sections.forEach((ss: SousSection) => {
+      reportData.sous_sections.forEach((ss: SousSection) => {
         bEdits[ss.id] = ss.bilan.map((b) => ({ ...b }));
         pEdits[ss.id] = ss.plan_action.map((p) => ({ ...p }));
       });
@@ -118,14 +142,8 @@ function ReportDetailContent() {
     );
   }
 
-  const canEdit = (sousSection: SousSection) => {
-    if (report.statut === 'valide' || report.statut === 'archive') return false;
-    if (user.is_admin) return true;
-    return user.sous_sections?.some((ss: { id: number }) => ss.id === sousSection.id) || false;
-  };
-
   const currentSS = report.sous_sections[activeTab];
-  const isEditable = currentSS ? canEdit(currentSS) : false;
+  const isEditable = currentSS ? (currentSS.can_edit && report.statut !== 'valide' && report.statut !== 'cloture') || user.is_admin : false;
 
   const handleSaveBilan = async () => {
     if (!currentSS) return;
@@ -142,12 +160,13 @@ function ReportDetailContent() {
       for (const entry of entries) {
         await saveBilanEntry({
           id: entry.id,
-          report_id: report.id,
-          sous_section_id: currentSS.id,
+          report_section_id: currentSS.id,
           theme: entry.theme,
+          sous_theme: entry.sous_theme,
           points_positifs: entry.points_positifs,
           points_negatifs: entry.points_negatifs,
           propositions: entry.propositions,
+          ordre: entry.ordre,
         });
       }
       setSaveMessage('Bilan sauvegardé avec succès');
@@ -175,13 +194,14 @@ function ReportDetailContent() {
       for (const entry of entries) {
         await savePlanEntry({
           id: entry.id,
-          report_id: report.id,
-          sous_section_id: currentSS.id,
+          report_section_id: currentSS.id,
+          numero_defi: entry.numero_defi,
           defi: entry.defi,
           action_a: entry.action_a,
           action_b: entry.action_b,
           action_c: entry.action_c,
           action_d: entry.action_d,
+          ordre: entry.ordre,
         });
       }
       setSaveMessage('Plan d\'action sauvegardé avec succès');
