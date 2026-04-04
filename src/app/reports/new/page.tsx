@@ -39,8 +39,14 @@ export default function NewReportPage() {
     setSubmitting(true);
 
     try {
-      const result = await createReport({ titre, annee, trimestre, type });
-      router.push(`/reports/view?id=${result.id}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result: any = await createReport({ titre, annee, trimestre, type });
+      const newId = result.id || result.report_id;
+      if (newId) {
+        router.push(`/reports/view?id=${newId}`);
+      } else {
+        router.push('/reports');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la creation');
     } finally {
