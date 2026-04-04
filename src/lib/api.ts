@@ -43,10 +43,9 @@ export async function login(email: string, password: string): Promise<any> {
 }
 
 // Sous-sections
-export async function getSousSections() {
-  return request<Array<{ id: number; nom: string; slug: string; couleur: string }>>(
-    '/api/report/sous-sections'
-  );
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getSousSections(): Promise<any> {
+  return request<Record<string, unknown>>('/api/report/sous-sections');
 }
 
 // Reports

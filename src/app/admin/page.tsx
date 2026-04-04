@@ -62,7 +62,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAuthenticated && user?.is_admin) {
       getSousSections()
-        .then(setSousSections)
+        .then((data) => setSousSections(data.sous_sections || data || []))
         .catch((err) => console.error('Erreur chargement sous-sections:', err));
     }
   }, [isAuthenticated, user]);
