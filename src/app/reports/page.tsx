@@ -154,7 +154,7 @@ export default function ReportsPage() {
               {reports.map((report) => (
                 <tr key={report.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
-                    <Link href={`/reports/${report.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                    <Link href={`/reports/view?id=${report.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600">
                       {report.titre}
                     </Link>
                   </td>
@@ -167,7 +167,7 @@ export default function ReportsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Link
-                      href={`/reports/${report.id}`}
+                      href={`/reports/view?id=${report.id}`}
                       className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                     >
                       Voir / Editer

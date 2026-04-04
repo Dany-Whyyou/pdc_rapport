@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import {
   getReport,
@@ -44,11 +44,11 @@ interface ReportData {
   sous_sections: SousSection[];
 }
 
-export default function ReportDetailPage() {
+function ReportDetailContent() {
   const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const reportId = Number(params.id);
+  const searchParams = useSearchParams();
+  const reportId = Number(searchParams.get('id'));
 
   const [report, setReport] = useState<ReportData | null>(null);
   const [loadingReport, setLoadingReport] = useState(true);
@@ -56,7 +56,6 @@ export default function ReportDetailPage() {
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  // Track local edits per sous-section
   const [bilanEdits, setBilanEdits] = useState<Record<number, BilanEntry[]>>({});
   const [planEdits, setPlanEdits] = useState<Record<number, PlanEntry[]>>({});
 
@@ -72,10 +71,9 @@ export default function ReportDetailPage() {
     try {
       const data = await getReport(reportId);
       setReport(data);
-      // Initialize edits from fetched data
       const bEdits: Record<number, BilanEntry[]> = {};
       const pEdits: Record<number, PlanEntry[]> = {};
-      data.sous_sections.forEach((ss) => {
+      data.sous_sections.forEach((ss: SousSection) => {
         bEdits[ss.id] = ss.bilan.map((b) => ({ ...b }));
         pEdits[ss.id] = ss.plan_action.map((p) => ({ ...p }));
       });
@@ -96,6 +94,14 @@ export default function ReportDetailPage() {
 
   if (loading || !user) return null;
 
+  if (!reportId) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-gray-500">Aucun rapport sélectionné</p>
+      </div>
+    );
+  }
+
   if (loadingReport) {
     return (
       <div className="p-8 flex items-center justify-center">
@@ -115,7 +121,7 @@ export default function ReportDetailPage() {
   const canEdit = (sousSection: SousSection) => {
     if (report.statut === 'valide' || report.statut === 'archive') return false;
     if (user.is_admin) return true;
-    return user.sous_sections?.some((ss) => ss.id === sousSection.id) || false;
+    return user.sous_sections?.some((ss: { id: number }) => ss.id === sousSection.id) || false;
   };
 
   const currentSS = report.sous_sections[activeTab];
@@ -127,14 +133,12 @@ export default function ReportDetailPage() {
     setSaveMessage('');
     try {
       const entries = bilanEdits[currentSS.id] || [];
-      // Delete removed entries
       const originalIds = currentSS.bilan.map((b) => b.id);
       const currentIds = entries.filter((e) => e.id).map((e) => e.id!);
       const toDelete = originalIds.filter((id) => !currentIds.includes(id));
       for (const id of toDelete) {
         await deleteBilanEntry(id);
       }
-      // Save/update entries
       for (const entry of entries) {
         await saveBilanEntry({
           id: entry.id,
@@ -146,7 +150,7 @@ export default function ReportDetailPage() {
           propositions: entry.propositions,
         });
       }
-      setSaveMessage('Bilan sauvegarde avec succes');
+      setSaveMessage('Bilan sauvegardé avec succès');
       await loadReport();
     } catch (err) {
       setSaveMessage(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde');
@@ -162,14 +166,12 @@ export default function ReportDetailPage() {
     setSaveMessage('');
     try {
       const entries = planEdits[currentSS.id] || [];
-      // Delete removed entries
       const originalIds = currentSS.plan_action.map((p) => p.id);
       const currentIds = entries.filter((e) => e.id).map((e) => e.id!);
       const toDelete = originalIds.filter((id) => !currentIds.includes(id));
       for (const id of toDelete) {
         await deletePlanEntry(id);
       }
-      // Save/update entries
       for (const entry of entries) {
         await savePlanEntry({
           id: entry.id,
@@ -182,7 +184,7 @@ export default function ReportDetailPage() {
           action_d: entry.action_d,
         });
       }
-      setSaveMessage('Plan d\'action sauvegarde avec succes');
+      setSaveMessage('Plan d\'action sauvegardé avec succès');
       await loadReport();
     } catch (err) {
       setSaveMessage(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde');
@@ -193,7 +195,7 @@ export default function ReportDetailPage() {
   };
 
   const handleValidate = async () => {
-    if (!confirm('Etes-vous sur de vouloir valider ce rapport ? Cette action est irreversible.')) return;
+    if (!confirm('Êtes-vous sûr de vouloir valider ce rapport ? Cette action est irréversible.')) return;
     try {
       await validateReport(report.id);
       await loadReport();
@@ -206,8 +208,8 @@ export default function ReportDetailPage() {
     switch (statut) {
       case 'brouillon': return 'Brouillon';
       case 'en_cours': return 'En cours';
-      case 'valide': return 'Valide';
-      case 'archive': return 'Archive';
+      case 'valide': return 'Validé';
+      case 'archive': return 'Archivé';
       default: return statut;
     }
   };
@@ -240,7 +242,7 @@ export default function ReportDetailPage() {
               </span>
             </div>
             <p className="text-sm text-gray-500">
-              Annee {report.annee} - Trimestre {report.trimestre}
+              Année {report.annee} - Trimestre {report.trimestre}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -263,7 +265,7 @@ export default function ReportDetailPage() {
       {/* Save message */}
       {saveMessage && (
         <div className={`mb-4 p-3 rounded-lg text-sm ${
-          saveMessage.includes('succes') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+          saveMessage.includes('succès') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
           {saveMessage}
         </div>
@@ -303,9 +305,6 @@ export default function ReportDetailPage() {
                       disabled={saving}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
                       {saving ? 'Sauvegarde...' : 'Sauvegarder le bilan'}
                     </button>
                   )}
@@ -331,9 +330,6 @@ export default function ReportDetailPage() {
                       disabled={saving}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
                       {saving ? 'Sauvegarde...' : 'Sauvegarder le plan'}
                     </button>
                   )}
@@ -355,5 +351,17 @@ export default function ReportDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ReportDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <ReportDetailContent />
+    </Suspense>
   );
 }

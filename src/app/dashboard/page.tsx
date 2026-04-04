@@ -164,7 +164,7 @@ export default function DashboardPage() {
                 {recentReports.map((report) => (
                   <Link
                     key={report.id}
-                    href={`/reports/${report.id}`}
+                    href={`/reports/view?id=${report.id}`}
                     className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                   >
                     <div>

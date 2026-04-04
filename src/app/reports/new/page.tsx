@@ -40,7 +40,7 @@ export default function NewReportPage() {
 
     try {
       const result = await createReport({ titre, annee, trimestre, type });
-      router.push(`/reports/${result.id}`);
+      router.push(`/reports/view?id=${result.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la creation');
     } finally {
