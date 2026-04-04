@@ -11,6 +11,7 @@ import {
   getMembresActifs,
   getReportAdmins,
   setReportAdmin,
+  getReportLogs,
 } from '@/lib/api';
 
 interface SousSection {
@@ -33,7 +34,12 @@ export default function AdminPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<'sous-sections' | 'admins'>('sous-sections');
+  const [activeTab, setActiveTab] = useState<'sous-sections' | 'admins' | 'logs'>('sous-sections');
+
+  // Logs state
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
 
   // Sous-sections state
   const [sousSections, setSousSections] = useState<SousSection[]>([]);
@@ -85,6 +91,16 @@ export default function AdminPage() {
         .then((data) => setAdmins(data.admins || []))
         .catch((err) => console.error('Erreur chargement admins:', err))
         .finally(() => setLoadingAdmins(false));
+    }
+  }, [activeTab, isAuthenticated]);
+
+  useEffect(() => {
+    if (activeTab === 'logs' && isAuthenticated) {
+      setLoadingLogs(true);
+      getReportLogs({ limit: 200 })
+        .then((data: { logs: unknown[] }) => setLogs(data.logs || []))
+        .catch((err: unknown) => console.error('Erreur chargement logs:', err))
+        .finally(() => setLoadingLogs(false));
     }
   }, [activeTab, isAuthenticated]);
 
@@ -185,6 +201,14 @@ export default function AdminPage() {
           }`}
         >
           Administrateurs
+        </button>
+        <button
+          onClick={() => setActiveTab('logs')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeTab === 'logs' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          Journal d&apos;activité
         </button>
       </div>
 
@@ -362,6 +386,82 @@ export default function AdminPage() {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Logs Tab */}
+      {activeTab === 'logs' && (
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-700">Journal d&apos;activité</h2>
+          </div>
+          {loadingLogs ? (
+            <div className="p-8 text-sm text-gray-500 text-center">Chargement...</div>
+          ) : logs.length === 0 ? (
+            <div className="p-8 text-sm text-gray-500 text-center">Aucune activité enregistrée</div>
+          ) : (
+            <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+              {logs.map((log) => {
+                const actionLabels: Record<string, string> = {
+                  create_report: 'a créé un rapport',
+                  add_section: 'a ajouté une sous-section',
+                  remove_section: 'a retiré une sous-section',
+                  save_bilan: 'a modifié le bilan',
+                  save_plan: 'a modifié le plan d\'action',
+                  delete_bilan: 'a supprimé une entrée bilan',
+                  delete_plan: 'a supprimé une entrée plan',
+                  validate: 'a validé le rapport',
+                  add_member: 'a ajouté un membre',
+                  remove_member: 'a retiré un membre',
+                };
+                const actionColors: Record<string, string> = {
+                  create_report: 'bg-blue-100 text-blue-700',
+                  add_section: 'bg-green-100 text-green-700',
+                  remove_section: 'bg-red-100 text-red-700',
+                  save_bilan: 'bg-yellow-100 text-yellow-700',
+                  save_plan: 'bg-purple-100 text-purple-700',
+                  delete_bilan: 'bg-red-100 text-red-700',
+                  delete_plan: 'bg-red-100 text-red-700',
+                  validate: 'bg-green-100 text-green-700',
+                  add_member: 'bg-blue-100 text-blue-700',
+                  remove_member: 'bg-orange-100 text-orange-700',
+                };
+                const details = log.details_parsed || {};
+                const date = new Date(log.created_at);
+                const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                return (
+                  <div key={log.id} className="flex items-start gap-3 px-4 py-3">
+                    {log.photo ? (
+                      <img src={log.photo} alt="" className="w-8 h-8 rounded-full object-cover mt-0.5" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                        <span className="text-blue-700 text-xs font-semibold">
+                          {(log.name || '?').charAt(0)}{(log.surname || '').charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium text-gray-900">{log.name} {log.surname}</span>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${actionColors[log.action] || 'bg-gray-100 text-gray-700'}`}>
+                          {actionLabels[log.action] || log.action}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
+                        {log.report_titre && <span>📄 {log.report_titre}</span>}
+                        {details.sous_section && <span>• {details.sous_section}</span>}
+                        {details.theme && <span>• {details.theme}</span>}
+                        {details.membre && <span>• {details.membre}</span>}
+                        {details.role && <span>({details.role})</span>}
+                      </div>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{dateStr}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

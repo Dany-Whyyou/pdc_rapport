@@ -133,6 +133,16 @@ export async function removeSectionFromReport(data: { report_id: number; sous_se
   });
 }
 
+// Activity logs
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getReportLogs(params?: { report_id?: number; limit?: number }): Promise<any> {
+  const query = new URLSearchParams();
+  if (params?.report_id) query.set('report_id', String(params.report_id));
+  if (params?.limit) query.set('limit', String(params.limit));
+  const qs = query.toString();
+  return request<Record<string, unknown>>(`/api/report/logs${qs ? '?' + qs : ''}`);
+}
+
 // Bilan entries
 export async function saveBilanEntry(data: {
   id?: number;
