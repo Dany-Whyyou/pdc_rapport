@@ -121,26 +121,32 @@ export default function AdminPage() {
     setShowAddModal(false);
   };
 
+  const [confirmDeleteMember, setConfirmDeleteMember] = useState<number | null>(null);
+
   const handleRemoveMember = async (membreId: number) => {
     if (!selectedSS) return;
-    if (!confirm('Retirer ce membre de la sous-section ?')) return;
     try {
       await removeSousSectionMember({ sous_section_id: selectedSS, user_id: membreId });
       const data = await getSousSectionMembers(selectedSS);
       setSSMembers(data.membres || []);
+      setConfirmDeleteMember(null);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erreur');
+      setConfirmDeleteMember(null);
     }
   };
 
+  const [confirmDeleteAdmin, setConfirmDeleteAdmin] = useState<number | null>(null);
+
   const handleRemoveAdmin = async (membreId: number) => {
-    if (!confirm('Retirer les droits administrateur a cet utilisateur ?')) return;
     try {
       await setReportAdmin({ user_id: membreId, can_edit_all: false, can_validate: false, can_export: false });
       const data = await getReportAdmins();
       setAdmins(data.admins || []);
+      setConfirmDeleteAdmin(null);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erreur');
+      setConfirmDeleteAdmin(null);
     }
   };
 
@@ -256,15 +262,32 @@ export default function AdminPage() {
                         <p className="text-xs text-gray-500">{m.email}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleRemoveMember(m.id)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                      title="Retirer"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                    {confirmDeleteMember === m.id ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleRemoveMember(m.id)}
+                          className="px-2 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700"
+                        >
+                          Confirmer
+                        </button>
+                        <button
+                          onClick={() => setConfirmDeleteMember(null)}
+                          className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-lg hover:bg-gray-300"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeleteMember(m.id)}
+                        className="text-red-500 hover:text-red-700 p-1"
+                        title="Retirer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -311,15 +334,32 @@ export default function AdminPage() {
                       <p className="text-xs text-gray-500">{m.email}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleRemoveAdmin(m.user_id || m.id)}
-                    className="text-red-500 hover:text-red-700 p-1"
-                    title="Retirer les droits admin"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  {confirmDeleteAdmin === (m.user_id || m.id) ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleRemoveAdmin(m.user_id || m.id)}
+                        className="px-2 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700"
+                      >
+                        Confirmer
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteAdmin(null)}
+                        className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-lg hover:bg-gray-300"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteAdmin(m.user_id || m.id)}
+                      className="text-red-500 hover:text-red-700 p-1"
+                      title="Retirer les droits admin"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
