@@ -73,6 +73,7 @@ function ReportDetailContent() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [allSousSections, setAllSousSections] = useState<any[]>([]);
   const [confirmRemoveSection, setConfirmRemoveSection] = useState<number | null>(null);
+  const [confirmValidate, setConfirmValidate] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -223,7 +224,6 @@ function ReportDetailContent() {
     }
   };
 
-  const [confirmValidate, setConfirmValidate] = useState(false);
   const handleValidate = async () => {
     try {
       await validateReport(report.id);
