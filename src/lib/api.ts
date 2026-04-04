@@ -118,6 +118,21 @@ export async function createReport(data: {
   });
 }
 
+// Report sections management
+export async function addSectionToReport(data: { report_id: number; sous_section_id: number }) {
+  return request<{ success: boolean; message: string }>('/api/report/reports/add-section', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function removeSectionFromReport(data: { report_id: number; sous_section_id: number }) {
+  return request<{ success: boolean; message: string }>('/api/report/reports/remove-section', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 // Bilan entries
 export async function saveBilanEntry(data: {
   id?: number;
