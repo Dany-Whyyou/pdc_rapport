@@ -139,7 +139,7 @@ function ReportDetailContent() {
   if (loadingReport) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pdc-primary"></div>
       </div>
     );
   }
@@ -287,7 +287,7 @@ function ReportDetailContent() {
       case 'brouillon': return 'bg-gray-100 text-gray-700';
       case 'en_cours': return 'bg-yellow-100 text-yellow-700';
       case 'valide': return 'bg-green-100 text-green-700';
-      case 'archive': return 'bg-blue-100 text-blue-700';
+      case 'archive': return 'bg-pdc-cream-dark text-pdc-primary-dark';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -356,7 +356,7 @@ function ReportDetailContent() {
                 onClick={() => setActiveTab(index)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                   activeTab === index
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-pdc-primary text-white'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -366,7 +366,7 @@ function ReportDetailContent() {
             {user.is_admin && report.statut !== 'valide' && report.statut !== 'cloture' && (
               <button
                 onClick={handleOpenAddSection}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-pdc-primary hover:bg-pdc-cream-dark transition-colors whitespace-nowrap"
                 title="Ajouter une sous-section"
               >
                 + Ajouter
@@ -407,7 +407,7 @@ function ReportDetailContent() {
                     <button
                       onClick={handleSaveBilan}
                       disabled={saving}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-pdc-primary text-white text-sm font-semibold rounded-lg hover:bg-pdc-primary-dark disabled:opacity-50 transition-colors"
                     >
                       {saving ? 'Sauvegarde...' : 'Sauvegarder le bilan'}
                     </button>
@@ -455,7 +455,7 @@ function ReportDetailContent() {
           {user.is_admin && report.statut !== 'valide' && report.statut !== 'cloture' && (
             <button
               onClick={handleOpenAddSection}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-pdc-primary text-white text-sm font-semibold rounded-lg hover:bg-pdc-primary-dark transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -507,7 +507,7 @@ export default function ReportDetailPage() {
   return (
     <Suspense fallback={
       <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pdc-primary"></div>
       </div>
     }>
       <ReportDetailContent />

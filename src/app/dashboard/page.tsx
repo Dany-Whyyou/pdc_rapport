@@ -58,7 +58,7 @@ export default function DashboardPage() {
       case 'brouillon': return 'bg-gray-100 text-gray-700';
       case 'en_cours': return 'bg-yellow-100 text-yellow-700';
       case 'valide': return 'bg-green-100 text-green-700';
-      case 'archive': return 'bg-blue-100 text-blue-700';
+      case 'archive': return 'bg-pdc-cream-dark text-pdc-primary-dark';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -66,13 +66,17 @@ export default function DashboardPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       {/* Welcome */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Bonjour, {user.name} {user.surname}
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Bienvenue sur la plateforme de rapports Porte des Cieux
-        </p>
+      <div className="mb-8 flex items-center gap-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo_pdc.png" alt="PDC" className="w-14 h-14 rounded-full shadow-md" />
+        <div>
+          <h1 className="text-2xl font-bold text-pdc-primary">
+            Bonjour, {user.name} {user.surname}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Bienvenue sur la plateforme de rapports Porte des Cieux
+          </p>
+        </div>
       </div>
 
       {/* Quick Stats */}
@@ -107,7 +111,7 @@ export default function DashboardPage() {
               {user.is_admin && (
                 <Link
                   href="/reports/new"
-                  className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-pdc-cream-dark text-pdc-primary-dark hover:bg-pdc-cream-dark transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -134,9 +138,9 @@ export default function DashboardPage() {
                   {user.sous_sections.map((ss) => (
                     <div
                       key={ss.id}
-                      className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 text-blue-700"
+                      className="flex items-center gap-2 p-2 rounded-lg bg-pdc-cream-dark text-pdc-primary-dark"
                     >
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-pdc-cream-dark0"></div>
                       <span className="text-sm">{ss.nom}</span>
                     </div>
                   ))}
@@ -151,7 +155,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Rapports recents</h2>
-              <Link href="/reports" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <Link href="/reports" className="text-sm text-pdc-primary hover:text-pdc-primary-dark font-medium">
                 Voir tout
               </Link>
             </div>

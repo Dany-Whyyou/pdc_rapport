@@ -52,21 +52,21 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-blue-600 text-white">
-            <th className="border border-blue-700 px-4 py-3 text-left text-sm font-semibold w-1/6">
+          <tr className="bg-pdc-primary text-white">
+            <th className="border border-pdc-primary px-4 py-3 text-left text-sm font-semibold w-1/6">
               Theme
             </th>
-            <th className="border border-blue-700 px-4 py-3 text-left text-sm font-semibold w-[27%]">
+            <th className="border border-pdc-primary px-4 py-3 text-left text-sm font-semibold w-[27%]">
               Points positifs
             </th>
-            <th className="border border-blue-700 px-4 py-3 text-left text-sm font-semibold w-[27%]">
+            <th className="border border-pdc-primary px-4 py-3 text-left text-sm font-semibold w-[27%]">
               Ce qui n&apos;a pas marche
             </th>
-            <th className="border border-blue-700 px-4 py-3 text-left text-sm font-semibold w-[27%]">
+            <th className="border border-pdc-primary px-4 py-3 text-left text-sm font-semibold w-[27%]">
               Propositions
             </th>
             {!readOnly && (
-              <th className="border border-blue-700 px-2 py-3 text-center text-sm font-semibold w-12">
+              <th className="border border-pdc-primary px-2 py-3 text-center text-sm font-semibold w-12">
                 &nbsp;
               </th>
             )}
@@ -82,7 +82,7 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
                   <textarea
                     value={entry.theme}
                     onChange={(e) => updateEntry(index, 'theme', e.target.value)}
-                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary resize-y"
                     placeholder="Theme..."
                   />
                 )}
@@ -94,7 +94,7 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
                   <textarea
                     value={entry.points_positifs}
                     onChange={(e) => updateEntry(index, 'points_positifs', e.target.value)}
-                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary resize-y"
                     placeholder="Points positifs..."
                   />
                 )}
@@ -106,7 +106,7 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
                   <textarea
                     value={entry.points_negatifs}
                     onChange={(e) => updateEntry(index, 'points_negatifs', e.target.value)}
-                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary resize-y"
                     placeholder="Ce qui n'a pas marche..."
                   />
                 )}
@@ -118,7 +118,7 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
                   <textarea
                     value={entry.propositions}
                     onChange={(e) => updateEntry(index, 'propositions', e.target.value)}
-                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                    className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary resize-y"
                     placeholder="Propositions..."
                   />
                 )}
@@ -150,7 +150,7 @@ export default function BilanTable({ entries, onChange, readOnly = false }: Bila
       {!readOnly && (
         <button
           onClick={addEntry}
-          className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors"
+          className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-pdc-cream-dark text-pdc-primary-dark text-sm font-medium rounded-lg hover:bg-pdc-cream-dark transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

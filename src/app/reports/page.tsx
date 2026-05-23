@@ -61,7 +61,7 @@ export default function ReportsPage() {
       case 'brouillon': return 'bg-gray-100 text-gray-700';
       case 'en_cours': return 'bg-yellow-100 text-yellow-700';
       case 'valide': return 'bg-green-100 text-green-700';
-      case 'archive': return 'bg-blue-100 text-blue-700';
+      case 'archive': return 'bg-pdc-cream-dark text-pdc-primary-dark';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -80,7 +80,7 @@ export default function ReportsPage() {
         {user.is_admin && (
           <Link
             href="/reports/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-pdc-primary text-white text-sm font-semibold rounded-lg hover:bg-pdc-primary-dark transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -98,7 +98,7 @@ export default function ReportsPage() {
             <select
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
             >
               <option value="">Toutes</option>
               {years.map((y) => (
@@ -111,7 +111,7 @@ export default function ReportsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
             >
               <option value="">Tous</option>
               <option value="brouillon">Brouillon</option>
@@ -154,7 +154,7 @@ export default function ReportsPage() {
               {reports.map((report) => (
                 <tr key={report.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
-                    <Link href={`/reports/view?id=${report.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                    <Link href={`/reports/view?id=${report.id}`} className="text-sm font-medium text-gray-900 hover:text-pdc-primary">
                       {report.titre}
                     </Link>
                   </td>
@@ -168,7 +168,7 @@ export default function ReportsPage() {
                   <td className="px-6 py-4 text-right">
                     <Link
                       href={`/reports/view?id=${report.id}`}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-sm text-pdc-primary hover:text-pdc-primary-dark font-medium"
                     >
                       Voir / Editer
                     </Link>

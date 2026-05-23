@@ -189,7 +189,7 @@ export default function AdminPage() {
         <button
           onClick={() => setActiveTab('sous-sections')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'sous-sections' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+            activeTab === 'sous-sections' ? 'bg-pdc-primary text-white' : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
           Sous-sections
@@ -197,7 +197,7 @@ export default function AdminPage() {
         <button
           onClick={() => setActiveTab('admins')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'admins' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+            activeTab === 'admins' ? 'bg-pdc-primary text-white' : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
           Administrateurs
@@ -205,7 +205,7 @@ export default function AdminPage() {
         <button
           onClick={() => setActiveTab('logs')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'logs' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+            activeTab === 'logs' ? 'bg-pdc-primary text-white' : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
           Journal d&apos;activité
@@ -226,7 +226,7 @@ export default function AdminPage() {
                   key={ss.id}
                   onClick={() => setSelectedSS(ss.id)}
                   className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
-                    selectedSS === ss.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                    selectedSS === ss.id ? 'bg-pdc-cream-dark text-pdc-primary-dark' : 'text-gray-700'
                   }`}
                 >
                   <p className="font-medium">{ss.nom}</p>
@@ -250,7 +250,7 @@ export default function AdminPage() {
               {selectedSS && (
                 <button
                   onClick={() => openAddModal('member')}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-pdc-primary text-white text-xs font-semibold rounded-lg hover:bg-pdc-primary-dark transition-colors"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -275,8 +275,8 @@ export default function AdminPage() {
                       {m.photo ? (
                         <img src={m.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-blue-700 text-xs font-semibold">
+                        <div className="w-8 h-8 rounded-full bg-pdc-cream-dark flex items-center justify-center">
+                          <span className="text-pdc-primary-dark text-xs font-semibold">
                             {m.name.charAt(0)}{m.surname.charAt(0)}
                           </span>
                         </div>
@@ -327,7 +327,7 @@ export default function AdminPage() {
             <h2 className="text-sm font-semibold text-gray-700">Administrateurs des rapports</h2>
             <button
               onClick={() => openAddModal('admin')}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-pdc-primary text-white text-xs font-semibold rounded-lg hover:bg-pdc-primary-dark transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -347,8 +347,8 @@ export default function AdminPage() {
                     {m.photo ? (
                       <img src={m.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-blue-700 text-xs font-semibold">
+                      <div className="w-8 h-8 rounded-full bg-pdc-cream-dark flex items-center justify-center">
+                        <span className="text-pdc-primary-dark text-xs font-semibold">
                           {m.name.charAt(0)}{m.surname.charAt(0)}
                         </span>
                       </div>
@@ -417,7 +417,7 @@ export default function AdminPage() {
                   remove_member: 'a retiré un membre',
                 };
                 const actionColors: Record<string, string> = {
-                  create_report: 'bg-blue-100 text-blue-700',
+                  create_report: 'bg-pdc-cream-dark text-pdc-primary-dark',
                   add_section: 'bg-green-100 text-green-700',
                   remove_section: 'bg-red-100 text-red-700',
                   save_bilan: 'bg-yellow-100 text-yellow-700',
@@ -425,7 +425,7 @@ export default function AdminPage() {
                   delete_bilan: 'bg-red-100 text-red-700',
                   delete_plan: 'bg-red-100 text-red-700',
                   validate: 'bg-green-100 text-green-700',
-                  add_member: 'bg-blue-100 text-blue-700',
+                  add_member: 'bg-pdc-cream-dark text-pdc-primary-dark',
                   remove_member: 'bg-orange-100 text-orange-700',
                 };
                 const details = log.details_parsed || {};
@@ -437,8 +437,8 @@ export default function AdminPage() {
                     {log.photo ? (
                       <img src={log.photo} alt="" className="w-8 h-8 rounded-full object-cover mt-0.5" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                        <span className="text-blue-700 text-xs font-semibold">
+                      <div className="w-8 h-8 rounded-full bg-pdc-cream-dark flex items-center justify-center mt-0.5">
+                        <span className="text-pdc-primary-dark text-xs font-semibold">
                           {(log.name || '?').charAt(0)}{(log.surname || '').charAt(0)}
                         </span>
                       </div>
@@ -490,7 +490,7 @@ export default function AdminPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Rechercher un membre..."
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
                 autoFocus
               />
             </div>
@@ -507,8 +507,8 @@ export default function AdminPage() {
                     {m.photo ? (
                       <img src={m.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-blue-700 text-xs font-semibold">
+                      <div className="w-8 h-8 rounded-full bg-pdc-cream-dark flex items-center justify-center">
+                        <span className="text-pdc-primary-dark text-xs font-semibold">
                           {m.name.charAt(0)}{m.surname.charAt(0)}
                         </span>
                       </div>

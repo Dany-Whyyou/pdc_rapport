@@ -36,14 +36,13 @@ export default function LoginPage() {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pdc-cream to-pdc-cream-dark px-4">
       <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <span className="text-white font-bold text-2xl">P</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Porte des Cieux</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo_pdc.png" alt="PDC" className="inline-block w-20 h-20 rounded-full mb-4 shadow-lg" />
+          <h1 className="text-2xl font-bold text-pdc-primary">Porte des Cieux</h1>
           <p className="text-gray-500 mt-1">Plateforme de rapports</p>
         </div>
 
@@ -68,7 +67,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none transition-colors"
                 placeholder="votre@email.com"
               />
             </div>
@@ -83,7 +82,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none transition-colors"
                 placeholder="Votre mot de passe"
               />
             </div>
@@ -91,7 +90,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 px-4 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-2.5 px-4 bg-pdc-primary text-white text-sm font-semibold rounded-lg hover:bg-pdc-primary-dark focus:ring-4 focus:ring-pdc-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? 'Connexion en cours...' : 'Se connecter'}
             </button>

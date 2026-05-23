@@ -204,7 +204,7 @@ function PosterEditorContent() {
           <div>
             <button
               onClick={() => router.push('/posters')}
-              className="text-blue-600 text-sm hover:underline mb-1"
+              className="text-pdc-primary text-sm hover:underline mb-1"
             >
               ← Retour aux posters
             </button>
@@ -223,7 +223,7 @@ function PosterEditorContent() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="bg-pdc-primary hover:bg-pdc-primary-dark text-white px-5 py-2 rounded-lg font-medium disabled:opacity-50"
             >
               {isSaving ? 'Enregistrement...' : '💾 Enregistrer'}
             </button>

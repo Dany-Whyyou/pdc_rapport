@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #1e293b;
+  --background: #fbf9f4;
+  --foreground: #1f2937;
+
+  /* Palette PDC inspirée du logo */
+  --pdc-primary: #345151;
+  --pdc-primary-dark: #243a3a;
+  --pdc-primary-light: #4a6f6f;
+  --pdc-accent: #c89a3f;
+  --pdc-accent-dark: #a07d29;
+  --pdc-accent-light: #e0b860;
+  --pdc-cream: #fbf9f4;
+  --pdc-cream-dark: #f0eadc;
 }
 
 @theme inline {
@@ -10,6 +20,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Couleurs PDC accessibles via Tailwind */
+  --color-pdc-primary: var(--pdc-primary);
+  --color-pdc-primary-dark: var(--pdc-primary-dark);
+  --color-pdc-primary-light: var(--pdc-primary-light);
+  --color-pdc-accent: var(--pdc-accent);
+  --color-pdc-accent-dark: var(--pdc-accent-dark);
+  --color-pdc-accent-light: var(--pdc-accent-light);
+  --color-pdc-cream: var(--pdc-cream);
+  --color-pdc-cream-dark: var(--pdc-cream-dark);
 }
 
 body {

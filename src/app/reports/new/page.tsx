@@ -85,7 +85,7 @@ export default function NewReportPage() {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
             >
               <option value="trimestriel">Trimestriel</option>
               <option value="semestriel">Semestriel</option>
@@ -101,7 +101,7 @@ export default function NewReportPage() {
               <select
                 value={annee}
                 onChange={(e) => setAnnee(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
               >
                 {years.map((y) => (
                   <option key={y} value={y}>{y}</option>
@@ -115,7 +115,7 @@ export default function NewReportPage() {
               <select
                 value={trimestre}
                 onChange={(e) => setTrimestre(parseInt(e.target.value))}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
               >
                 <option value={1}>T1 (Janvier - Mars)</option>
                 <option value={2}>T2 (Avril - Juin)</option>
@@ -134,7 +134,7 @@ export default function NewReportPage() {
               value={titre}
               onChange={(e) => setTitre(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
               placeholder="Titre du rapport"
             />
           </div>
@@ -150,7 +150,7 @@ export default function NewReportPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-6 py-2.5 bg-pdc-primary text-white text-sm font-semibold rounded-lg hover:bg-pdc-primary-dark disabled:opacity-50 transition-colors"
             >
               {submitting ? 'Creation...' : 'Creer le rapport'}
             </button>

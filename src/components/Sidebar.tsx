@@ -69,11 +69,10 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">P</span>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo_pdc.png" alt="PDC" className="w-12 h-12 rounded-full object-cover" />
           <div>
-            <h1 className="text-lg font-bold text-gray-900">PDC Reports</h1>
+            <h1 className="text-lg font-bold text-pdc-primary">PDC Reports</h1>
             <p className="text-xs text-gray-500">Porte des Cieux</p>
           </div>
         </Link>
@@ -90,7 +89,7 @@ export default function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700'
+                  ? 'bg-pdc-cream-dark text-pdc-primary-dark'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -111,8 +110,8 @@ export default function Sidebar() {
               className="w-9 h-9 rounded-full object-cover"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-700 font-semibold text-sm">
+            <div className="w-9 h-9 rounded-full bg-pdc-cream-dark flex items-center justify-center">
+              <span className="text-pdc-primary-dark font-semibold text-sm">
                 {user.name.charAt(0)}{user.surname.charAt(0)}
               </span>
             </div>
