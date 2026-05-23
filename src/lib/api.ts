@@ -255,3 +255,71 @@ export async function setReportAdmin(data: { user_id: number; can_edit_all?: boo
     body: JSON.stringify(data),
   });
 }
+
+// ==================== POSTERS / PLANS D'ACTION ====================
+
+export type PosterActivity = {
+  jour: string;        // ex: "DIMANCHE"
+  date: string;        // ex: "31 MAI"
+  titre: string;       // ex: "Priere en famille"
+  details?: string;    // ex: "Reception : les ALTI - lieu a confirmer ASAP"
+  horaire: string;     // ex: "16h00" / "16h - 22h" / "des 18h" / "Soiree"
+  highlight?: boolean; // mise en avant
+};
+
+export type PosterData = {
+  brand_name: string;          // ex: "New Praise Family"
+  brand_subtitle?: string;     // ex: "FAMILY"
+  program_number?: string;     // ex: "PROGRAMME N°05"
+  periode_label?: string;      // ex: "MAI - JUILLET 2026"
+  image_url?: string;          // URL de la photo top
+  image_data?: string;         // base64 alternative
+  color_dark: string;          // ex: "#1a2547"
+  color_accent: string;        // ex: "#c89a3f"
+  color_bg: string;            // ex: "#f4ede1"
+  title_main: string;          // ex: "CALENDRIER"
+  title_italic: string;        // ex: "des"
+  title_secondary: string;     // ex: "ACTIVITES"
+  activities: PosterActivity[];
+  footer_tags?: string;        // ex: "WORSHIP - SERVICE - FAMILLE"
+};
+
+export type Poster = {
+  id: number;
+  titre: string;
+  mois: number;
+  annee: number;
+  periode_label: string | null;
+  data: PosterData;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export async function getPosters() {
+  return request<{ success: boolean; posters: Array<Omit<Poster, 'data'>> }>('/api/report/posters');
+}
+
+export async function getPoster(id: number) {
+  return request<{ success: boolean; poster: Poster }>(`/api/report/posters/${id}`);
+}
+
+export async function savePoster(data: {
+  id?: number;
+  titre: string;
+  mois: number;
+  annee: number;
+  periode_label?: string;
+  data: PosterData;
+}) {
+  return request<{ success: boolean; id: number; message: string }>('/api/report/posters/save', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deletePoster(id: number) {
+  return request<{ success: boolean; message: string }>('/api/report/posters/delete', {
+    method: 'POST',
+    body: JSON.stringify({ id }),
+  });
+}
