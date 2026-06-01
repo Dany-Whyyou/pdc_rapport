@@ -143,18 +143,27 @@ const PosterPreview = forwardRef<HTMLDivElement, Props>(function PosterPreview(
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', columnGap: `${10 * scale}px` }}>
-          <span
-            style={{
-              fontSize: `${48 * scale}px`,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: colorDark,
-              lineHeight: 1,
-            }}
-          >
-            {data.title_main}
-          </span>
+        <div
+          style={{
+            fontSize: `${48 * scale}px`,
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            color: colorDark,
+            lineHeight: 1,
+          }}
+        >
+          {data.title_main}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            flexWrap: 'wrap',
+            columnGap: `${10 * scale}px`,
+            marginTop: `${4 * scale}px`,
+          }}
+        >
           {data.title_italic && (
             <span
               style={{
@@ -168,19 +177,17 @@ const PosterPreview = forwardRef<HTMLDivElement, Props>(function PosterPreview(
               {data.title_italic}
             </span>
           )}
-        </div>
-
-        <div
-          style={{
-            fontSize: `${48 * scale}px`,
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            color: colorDark,
-            lineHeight: 1,
-            marginTop: `${4 * scale}px`,
-          }}
-        >
-          {data.title_secondary}
+          <span
+            style={{
+              fontSize: `${48 * scale}px`,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: colorDark,
+              lineHeight: 1,
+            }}
+          >
+            {data.title_secondary}
+          </span>
         </div>
 
         {/* Souligne accent */}
