@@ -66,6 +66,9 @@ export async function getReports(params?: { year?: number; status?: string }) {
       type_slug?: string;
       sections_total?: number;
       sections_remplies?: number;
+      date_rapport?: string | null;
+      sous_section_nom?: string | null;
+      sous_section_couleur?: string | null;
     }>;
   }>(`/api/report/reports${qs ? '?' + qs : ''}`);
 }
@@ -114,6 +117,8 @@ export async function createReport(data: {
   annee: number;
   trimestre: number;
   type?: string;
+  date_rapport?: string;      // 'YYYY-MM-DD', pour rapport libre / activite
+  sous_section_id?: number;   // requis pour rapport-activite
 }) {
   return request<{ success: boolean; id: number; message: string }>('/api/report/reports/create', {
     method: 'POST',

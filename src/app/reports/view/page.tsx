@@ -57,6 +57,9 @@ interface ReportData {
   type_slug: string;
   contenu_libre: string;
   created_by: number | null;
+  date_rapport: string | null;
+  sous_section_nom: string | null;
+  sous_section_couleur: string | null;
 }
 
 function ReportDetailContent() {
@@ -114,6 +117,9 @@ function ReportDetailContent() {
         type_slug: (rAny.type_slug as string) || '',
         contenu_libre: (rAny.contenu_libre as string) || '',
         created_by: (rAny.created_by as number) ?? null,
+        date_rapport: (rAny.date_rapport as string) ?? null,
+        sous_section_nom: (rAny.sous_section_nom as string) ?? null,
+        sous_section_couleur: (rAny.sous_section_couleur as string) ?? null,
       };
       setReport(reportData);
       const bEdits: Record<number, BilanEntry[]> = {};
@@ -320,15 +326,34 @@ function ReportDetailContent() {
                 {statusLabel(report.statut)}
               </span>
             </div>
-            <p className="text-sm text-gray-500">
-              Année {report.annee}
-              {report.trimestre > 0 && ` - Trimestre ${report.trimestre}`}
+            <p className="text-sm text-gray-500 flex flex-wrap items-center gap-2">
+              {report.date_rapport
+                ? <>Date : {new Date(report.date_rapport).toLocaleDateString('fr-FR')}</>
+                : <>Année {report.annee}{report.trimestre > 0 && ` - Trimestre ${report.trimestre}`}</>
+              }
+              {report.type_slug === 'rapport-activite' && report.sous_section_nom && (
+                <span
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+                  style={{
+                    backgroundColor: (report.sous_section_couleur ?? '#94a3b8') + '20',
+                    color: report.sous_section_couleur ?? '#334155',
+                  }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: report.sous_section_couleur ?? '#94a3b8' }}
+                  />
+                  {report.sous_section_nom}
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-3">
             {/* Export bilan/plan : uniquement pour les rapports bilan.
-                Les rapports libres exportent depuis l'editeur (boutons dans FreeReportEditor). */}
-            {report.type_slug !== 'rapport-libre' && <ExportButtons reportId={report.id} />}
+                Les rapports libres/activite exportent depuis l'editeur (boutons dans FreeReportEditor). */}
+            {report.type_slug !== 'rapport-libre' && report.type_slug !== 'rapport-activite' && (
+              <ExportButtons reportId={report.id} />
+            )}
             {user.is_admin && report.statut !== 'valide' && report.statut !== 'cloture' && (
               confirmValidate ? (
                 <div className="flex items-center gap-2">
@@ -360,8 +385,8 @@ function ReportDetailContent() {
         </div>
       )}
 
-      {/* Rapport libre : editeur WYSIWYG global */}
-      {report.type_slug === 'rapport-libre' ? (
+      {/* Rapport libre ou d'activite : editeur WYSIWYG global */}
+      {(report.type_slug === 'rapport-libre' || report.type_slug === 'rapport-activite') ? (
         <FreeReportEditor
           initialContent={report.contenu_libre}
           canEdit={

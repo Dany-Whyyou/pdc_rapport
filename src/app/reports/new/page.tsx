@@ -3,10 +3,24 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { createReport } from '@/lib/api';
+import { createReport, getSousSections } from '@/lib/api';
 
-type ReportFamily = 'bilan' | 'libre';
+type ReportFamily = 'bilan' | 'libre' | 'activite';
 type BilanKind = 'trimestriel' | 'semestriel' | 'annuel';
+
+interface SousSection {
+  id: number;
+  nom: string;
+  couleur: string;
+}
+
+function todayIso(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 export default function NewReportPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -17,6 +31,9 @@ export default function NewReportPage() {
   const [titre, setTitre] = useState('');
   const [annee, setAnnee] = useState(new Date().getFullYear());
   const [trimestre, setTrimestre] = useState(1);
+  const [dateRapport, setDateRapport] = useState(todayIso());
+  const [sousSectionId, setSousSectionId] = useState<number | null>(null);
+  const [sousSections, setSousSections] = useState<SousSection[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,6 +46,27 @@ export default function NewReportPage() {
     }
   }, [isAuthenticated, loading, user, router]);
 
+  // Charge les sous-sections quand l'utilisateur passe sur "Rapport d'activite"
+  useEffect(() => {
+    if (family === 'activite' && sousSections.length === 0) {
+      getSousSections()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((data: any) => {
+          const list: SousSection[] = data.sous_sections || data || [];
+          setSousSections(list);
+          if (list.length > 0 && sousSectionId === null) {
+            setSousSectionId(list[0].id);
+          }
+        })
+        .catch((err) => console.error('Erreur chargement sous-sections:', err));
+    }
+  }, [family, sousSections.length, sousSectionId]);
+
+  const formatDateFr = (iso: string): string => {
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
   // Auto-generate title
   useEffect(() => {
     if (family === 'bilan') {
@@ -36,25 +74,40 @@ export default function NewReportPage() {
       const suffix = bilanKind === 'trimestriel' ? ` T${trimestre} - ${annee}` : ` - ${annee}`;
       setTitre(`Rapport ${typeLabel}${suffix}`);
     } else if (family === 'libre') {
-      setTitre(`Rapport libre - ${annee}`);
+      setTitre(`Rapport libre - ${formatDateFr(dateRapport)}`);
+    } else if (family === 'activite') {
+      const ss = sousSections.find((s) => s.id === sousSectionId);
+      const ssLabel = ss ? ` ${ss.nom}` : '';
+      setTitre(`Rapport d'activite${ssLabel} - ${formatDateFr(dateRapport)}`);
     }
-  }, [family, annee, trimestre, bilanKind]);
+  }, [family, annee, trimestre, bilanKind, dateRapport, sousSectionId, sousSections]);
 
   if (loading || !user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!family) return;
+    if (family === 'activite' && !sousSectionId) {
+      setError('Choisis la sous-section concernee par ce rapport d\'activite.');
+      return;
+    }
     setError('');
     setSubmitting(true);
 
-    const apiType = family === 'libre' ? 'libre' : bilanKind;
-    // Les rapports libres et semestriels/annuels n'ont pas de trimestre pertinent
+    const apiType = family === 'libre' ? 'libre' : family === 'activite' ? 'activite' : bilanKind;
     const payloadTrimestre = family === 'bilan' && bilanKind === 'trimestriel' ? trimestre : 0;
+    const payloadAnnee = family === 'bilan' ? annee : new Date(dateRapport).getFullYear();
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result: any = await createReport({ titre, annee, trimestre: payloadTrimestre, type: apiType });
+      const result: any = await createReport({
+        titre,
+        annee: payloadAnnee,
+        trimestre: payloadTrimestre,
+        type: apiType,
+        date_rapport: family === 'bilan' ? undefined : dateRapport,
+        sous_section_id: family === 'activite' ? sousSectionId! : undefined,
+      });
       const newId = result.id || result.report_id;
       if (newId) {
         router.push(`/reports/view?id=${newId}`);
@@ -85,7 +138,7 @@ export default function NewReportPage() {
       </div>
 
       {/* Etape 1 : choix du type */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <button
           type="button"
           onClick={() => setFamily('bilan')}
@@ -104,7 +157,7 @@ export default function NewReportPage() {
             <h3 className="font-semibold text-gray-900">Rapport bilan</h3>
           </div>
           <p className="text-sm text-gray-600">
-            Structure trimestrielle/semestrielle/annuelle par sous-section : points positifs, negatifs, propositions et plan d&apos;action.
+            Structure trimestrielle/semestrielle/annuelle par sous-section.
           </p>
         </button>
 
@@ -126,7 +179,29 @@ export default function NewReportPage() {
             <h3 className="font-semibold text-gray-900">Rapport libre</h3>
           </div>
           <p className="text-sm text-gray-600">
-            Editeur de texte libre (titres, gras, listes, tableaux). Ideal pour un rapport narratif exportable en PDF et Word.
+            Editeur libre (titres, gras, listes). Exportable PDF/Word.
+          </p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFamily('activite')}
+          className={`text-left p-5 border-2 rounded-xl transition-all ${
+            family === 'activite'
+              ? 'border-pdc-primary bg-pdc-primary/5 shadow-sm'
+              : 'border-gray-200 hover:border-gray-300 bg-white'
+          }`}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
+            <h3 className="font-semibold text-gray-900">Rapport d&apos;activite</h3>
+          </div>
+          <p className="text-sm text-gray-600">
+            Contenu libre attache a une sous-section specifique (Communication, Finance...).
           </p>
         </button>
       </div>
@@ -141,6 +216,27 @@ export default function NewReportPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {family === 'activite' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Sous-section concernee
+                </label>
+                <select
+                  value={sousSectionId ?? ''}
+                  onChange={(e) => setSousSectionId(parseInt(e.target.value))}
+                  required
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
+                >
+                  {sousSections.length === 0 && (
+                    <option value="" disabled>Chargement...</option>
+                  )}
+                  {sousSections.map((ss) => (
+                    <option key={ss.id} value={ss.id}>{ss.nom}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {family === 'bilan' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -158,39 +254,51 @@ export default function NewReportPage() {
               </div>
             )}
 
-            <div className={family === 'bilan' && bilanKind === 'trimestriel' ? 'grid grid-cols-2 gap-4' : ''}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Annee
-                </label>
-                <select
-                  value={annee}
-                  onChange={(e) => setAnnee(parseInt(e.target.value))}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
-                >
-                  {years.map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
-              {family === 'bilan' && bilanKind === 'trimestriel' && (
+            {/* Bilan : annee + trimestre eventuel — Libre/activite : date precise */}
+            {family === 'bilan' ? (
+              <div className={bilanKind === 'trimestriel' ? 'grid grid-cols-2 gap-4' : ''}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Trimestre
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Annee</label>
                   <select
-                    value={trimestre}
-                    onChange={(e) => setTrimestre(parseInt(e.target.value))}
+                    value={annee}
+                    onChange={(e) => setAnnee(parseInt(e.target.value))}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
                   >
-                    <option value={1}>T1 (Janvier - Mars)</option>
-                    <option value={2}>T2 (Avril - Juin)</option>
-                    <option value={3}>T3 (Juillet - Septembre)</option>
-                    <option value={4}>T4 (Octobre - Decembre)</option>
+                    {years.map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
                   </select>
                 </div>
-              )}
-            </div>
+                {bilanKind === 'trimestriel' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Trimestre</label>
+                    <select
+                      value={trimestre}
+                      onChange={(e) => setTrimestre(parseInt(e.target.value))}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
+                    >
+                      <option value={1}>T1 (Janvier - Mars)</option>
+                      <option value={2}>T2 (Avril - Juin)</option>
+                      <option value={3}>T3 (Juillet - Septembre)</option>
+                      <option value={4}>T4 (Octobre - Decembre)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Date du rapport
+                </label>
+                <input
+                  type="date"
+                  value={dateRapport}
+                  onChange={(e) => setDateRapport(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pdc-primary focus:border-pdc-primary outline-none"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">

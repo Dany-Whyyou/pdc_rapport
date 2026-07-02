@@ -17,7 +17,13 @@ interface Report {
   type_slug?: string;
   sections_total?: number;
   sections_remplies?: number;
+  date_rapport?: string | null;
+  sous_section_nom?: string | null;
+  sous_section_couleur?: string | null;
 }
+
+const isFreeContentType = (slug?: string) =>
+  slug === 'rapport-libre' || slug === 'rapport-activite';
 
 export default function ReportsPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -162,10 +168,10 @@ export default function ReportsPage() {
                   Titre
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Annee
+                  Date / Annee
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Trimestre
+                  Contexte
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Sous-sections
@@ -186,12 +192,34 @@ export default function ReportsPage() {
                       {report.titre}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{report.annee}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {report.trimestre > 0 ? `T${report.trimestre}` : '—'}
+                    {report.date_rapport
+                      ? new Date(report.date_rapport).toLocaleDateString('fr-FR')
+                      : report.annee}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {report.type_slug === 'rapport-activite' && report.sous_section_nom ? (
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor: (report.sous_section_couleur ?? '#94a3b8') + '20',
+                          color: report.sous_section_couleur ?? '#334155',
+                        }}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: report.sous_section_couleur ?? '#94a3b8' }}
+                        />
+                        {report.sous_section_nom}
+                      </span>
+                    ) : report.trimestre > 0 ? (
+                      `T${report.trimestre}`
+                    ) : (
+                      '—'
+                    )}
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    {report.type_slug === 'rapport-libre' ? (
+                    {isFreeContentType(report.type_slug) ? (
                       <span className="text-gray-400 text-xs">non applicable</span>
                     ) : (report.sections_total ?? 0) === 0 ? (
                       <span className="text-gray-400 text-xs">aucune</span>
