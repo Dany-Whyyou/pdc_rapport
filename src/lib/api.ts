@@ -63,6 +63,9 @@ export async function getReports(params?: { year?: number; status?: string }) {
       trimestre: number;
       statut: string;
       created_at: string;
+      type_slug?: string;
+      sections_total?: number;
+      sections_remplies?: number;
     }>;
   }>(`/api/report/reports${qs ? '?' + qs : ''}`);
 }
@@ -116,6 +119,23 @@ export async function createReport(data: {
     method: 'POST',
     body: JSON.stringify(data),
   });
+}
+
+export async function deleteReport(id: number) {
+  return request<{ success: boolean; message: string }>('/api/report/reports/delete', {
+    method: 'POST',
+    body: JSON.stringify({ id }),
+  });
+}
+
+export async function saveReportContent(reportId: number, contenuLibre: string) {
+  return request<{ success: boolean; message: string; statut: string }>(
+    '/api/report/reports/save-content',
+    {
+      method: 'POST',
+      body: JSON.stringify({ report_id: reportId, contenu_libre: contenuLibre }),
+    }
+  );
 }
 
 // Report sections management

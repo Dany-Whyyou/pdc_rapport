@@ -13,10 +13,13 @@ import {
   deleteBilanEntry,
   deletePlanEntry,
   validateReport,
+  saveReportContent,
 } from '@/lib/api';
 import BilanTable, { type BilanEntry } from '@/components/BilanTable';
 import PlanActionTable, { type PlanEntry } from '@/components/PlanActionTable';
 import ExportButtons from '@/components/ExportButtons';
+import FreeReportEditor from '@/components/FreeReportEditor';
+import { exportFreeReportPdf, exportFreeReportWord } from '@/lib/exportFreeReport';
 
 interface SousSection {
   id: number;
@@ -51,6 +54,9 @@ interface ReportData {
   trimestre: number;
   statut: string;
   sous_sections: SousSection[];
+  type_slug: string;
+  contenu_libre: string;
+  created_by: number | null;
 }
 
 function ReportDetailContent() {
@@ -96,6 +102,8 @@ function ReportDetailContent() {
         bilan: s.bilan_entries || [],
         plan_action: s.plan_entries || [],
       }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rAny = r as any;
       const reportData: ReportData = {
         id: r.id as number,
         titre: r.titre as string,
@@ -103,6 +111,9 @@ function ReportDetailContent() {
         trimestre: r.trimestre as number,
         statut: r.statut as string,
         sous_sections: mappedSections,
+        type_slug: (rAny.type_slug as string) || '',
+        contenu_libre: (rAny.contenu_libre as string) || '',
+        created_by: (rAny.created_by as number) ?? null,
       };
       setReport(reportData);
       const bEdits: Record<number, BilanEntry[]> = {};
@@ -310,11 +321,14 @@ function ReportDetailContent() {
               </span>
             </div>
             <p className="text-sm text-gray-500">
-              Année {report.annee} - Trimestre {report.trimestre}
+              Année {report.annee}
+              {report.trimestre > 0 && ` - Trimestre ${report.trimestre}`}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <ExportButtons reportId={report.id} />
+            {/* Export bilan/plan : uniquement pour les rapports bilan.
+                Les rapports libres exportent depuis l'editeur (boutons dans FreeReportEditor). */}
+            {report.type_slug !== 'rapport-libre' && <ExportButtons reportId={report.id} />}
             {user.is_admin && report.statut !== 'valide' && report.statut !== 'cloture' && (
               confirmValidate ? (
                 <div className="flex items-center gap-2">
@@ -346,8 +360,23 @@ function ReportDetailContent() {
         </div>
       )}
 
-      {/* Sous-section tabs */}
-      {report.sous_sections.length > 0 ? (
+      {/* Rapport libre : editeur WYSIWYG global */}
+      {report.type_slug === 'rapport-libre' ? (
+        <FreeReportEditor
+          initialContent={report.contenu_libre}
+          canEdit={
+            (user.is_admin || (report.created_by !== null && report.created_by === user.id)) &&
+            report.statut !== 'valide' && report.statut !== 'cloture'
+          }
+          onSave={async (html) => {
+            const result = await saveReportContent(report.id, html);
+            // Le statut peut passer de brouillon a en_cours cote backend
+            setReport((prev) => (prev ? { ...prev, statut: result.statut, contenu_libre: html } : prev));
+          }}
+          onExportPdf={(html) => exportFreeReportPdf(report.titre, html)}
+          onExportWord={(html) => exportFreeReportWord(report.titre, html)}
+        />
+      ) : report.sous_sections.length > 0 ? (
         <>
           <div className="flex overflow-x-auto gap-1 mb-6 bg-white rounded-xl border border-gray-200 p-1.5">
             {report.sous_sections.map((ss, index) => (

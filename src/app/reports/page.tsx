@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { getReports } from '@/lib/api';
+import { getReports, deleteReport } from '@/lib/api';
 
 interface Report {
   id: number;
@@ -14,6 +14,9 @@ interface Report {
   statut: string;
   created_at: string;
   updated_at?: string;
+  type_slug?: string;
+  sections_total?: number;
+  sections_remplies?: number;
 }
 
 export default function ReportsPage() {
@@ -23,6 +26,7 @@ export default function ReportsPage() {
   const [loadingReports, setLoadingReports] = useState(true);
   const [filterYear, setFilterYear] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -68,6 +72,27 @@ export default function ReportsPage() {
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  const handleDelete = async (report: Report) => {
+    const label = `${report.titre} (${report.annee} - T${report.trimestre})`;
+    const confirmed = window.confirm(
+      `Supprimer definitivement le rapport :\n\n${label}\n\n` +
+      `Toutes les sections, bilans et plans d'action associes seront perdus. ` +
+      `Cette action est irreversible.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(report.id);
+    try {
+      await deleteReport(report.id);
+      setReports((prev) => prev.filter((r) => r.id !== report.id));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      window.alert(`Suppression impossible : ${message}`);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -143,6 +168,9 @@ export default function ReportsPage() {
                   Trimestre
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Sous-sections
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Statut
                 </th>
                 <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -159,19 +187,61 @@ export default function ReportsPage() {
                     </Link>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{report.annee}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">T{report.trimestre}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {report.trimestre > 0 ? `T${report.trimestre}` : '—'}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {report.type_slug === 'rapport-libre' ? (
+                      <span className="text-gray-400 text-xs">non applicable</span>
+                    ) : (report.sections_total ?? 0) === 0 ? (
+                      <span className="text-gray-400 text-xs">aucune</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          {report.sections_remplies ?? 0}/{report.sections_total}
+                        </span>
+                        <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all ${
+                              (report.sections_remplies ?? 0) === report.sections_total
+                                ? 'bg-green-500'
+                                : (report.sections_remplies ?? 0) > 0
+                                  ? 'bg-yellow-500'
+                                  : 'bg-gray-300'
+                            }`}
+                            style={{
+                              width: `${((report.sections_remplies ?? 0) / Math.max(1, report.sections_total ?? 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${statusColor(report.statut)}`}>
                       {statusLabel(report.statut)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/reports/view?id=${report.id}`}
-                      className="text-sm text-pdc-primary hover:text-pdc-primary-dark font-medium"
-                    >
-                      Voir / Editer
-                    </Link>
+                    <div className="inline-flex items-center gap-4">
+                      <Link
+                        href={`/reports/view?id=${report.id}`}
+                        className="text-sm text-pdc-primary hover:text-pdc-primary-dark font-medium"
+                      >
+                        Voir / Editer
+                      </Link>
+                      {user.is_admin && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(report)}
+                          disabled={deletingId === report.id}
+                          className="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Supprimer ce rapport"
+                        >
+                          {deletingId === report.id ? 'Suppression...' : 'Supprimer'}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
