@@ -125,7 +125,7 @@ export default function NewReportPage() {
   const years = Array.from({ length: 5 }, (_, i) => currentYear + 1 - i);
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-6">
         <button onClick={() => router.push('/reports')} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-4">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,43 +142,43 @@ export default function NewReportPage() {
         <button
           type="button"
           onClick={() => setFamily('bilan')}
-          className={`text-left p-5 border-2 rounded-xl transition-all ${
+          className={`text-left p-4 border-2 rounded-xl transition-all ${
             family === 'bilan'
               ? 'border-pdc-primary bg-pdc-primary/5 shadow-sm'
               : 'border-gray-200 hover:border-gray-300 bg-white'
           }`}
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900">Rapport bilan</h3>
+            <h3 className="font-semibold text-sm text-gray-900 leading-tight">Rapport bilan</h3>
           </div>
-          <p className="text-sm text-gray-600">
-            Structure trimestrielle/semestrielle/annuelle par sous-section.
+          <p className="text-xs text-gray-600 leading-snug">
+            Structure trimestrielle, semestrielle ou annuelle par sous-section.
           </p>
         </button>
 
         <button
           type="button"
           onClick={() => setFamily('libre')}
-          className={`text-left p-5 border-2 rounded-xl transition-all ${
+          className={`text-left p-4 border-2 rounded-xl transition-all ${
             family === 'libre'
               ? 'border-pdc-primary bg-pdc-primary/5 shadow-sm'
               : 'border-gray-200 hover:border-gray-300 bg-white'
           }`}
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900">Rapport libre</h3>
+            <h3 className="font-semibold text-sm text-gray-900 leading-tight">Rapport libre</h3>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-xs text-gray-600 leading-snug">
             Editeur libre (titres, gras, listes). Exportable PDF/Word.
           </p>
         </button>
@@ -186,22 +186,22 @@ export default function NewReportPage() {
         <button
           type="button"
           onClick={() => setFamily('activite')}
-          className={`text-left p-5 border-2 rounded-xl transition-all ${
+          className={`text-left p-4 border-2 rounded-xl transition-all ${
             family === 'activite'
               ? 'border-pdc-primary bg-pdc-primary/5 shadow-sm'
               : 'border-gray-200 hover:border-gray-300 bg-white'
           }`}
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900">Rapport d&apos;activite</h3>
+            <h3 className="font-semibold text-sm text-gray-900 leading-tight">Rapport d&apos;activite</h3>
           </div>
-          <p className="text-sm text-gray-600">
-            Contenu libre attache a une sous-section specifique (Communication, Finance...).
+          <p className="text-xs text-gray-600 leading-snug">
+            Contenu libre attache a une sous-section (Communication, Finance...).
           </p>
         </button>
       </div>
